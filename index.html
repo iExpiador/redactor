@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Redactor HTML Pro</title>
+    <title>Redactor HTML</title>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- VARIABLES DE TEMA --- */
+           /* --- VARIABLES DE TEMA --- */
         :root {
             --primary: #3b82f6;
             --primary-hover: #2563eb;
@@ -48,6 +48,57 @@
             color: var(--text-main); display: flex; overflow: hidden;
             transition: background 0.3s ease, color 0.3s ease;
         }
+
+
+
+
+/* --- ZONA DE PUBLICIDAD SIDEBAR --- */
+.ad-zone-container {
+    /* Se asegura que quede al final de la barra flex */
+    margin-top: auto; 
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-body); /* Un tono diferente sutil para separar */
+    flex-shrink: 0; /* Evita que se aplaste si falta espacio */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo para el placeholder (borra esto cuando pongas un anuncio real) */
+.ad-placeholder {
+    width: 100%;
+    max-width: 240px; /* Ancho estándar común */
+    height: 240px;    /* Alto estándar común */
+    background-color: #e2e8f0;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+/* Adaptación al modo oscuro del placeholder */
+[data-theme="dark"] .ad-zone-container {
+    background: rgba(0,0,0,0.2);
+}
+[data-theme="dark"] .ad-placeholder {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+/* Ajuste Responsive: ocultar anuncio en móviles si la pantalla es muy corta */
+@media (max-height: 600px) and (max-width: 900px) {
+    .ad-zone-container { display: none; }
+}
+
+
 
         /* --- TOASTS --- */
         #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -153,7 +204,8 @@
         .ql-toolbar .ql-stroke { stroke: var(--text-main) !important; }
         .ql-toolbar .ql-fill { fill: var(--text-main) !important; }
         .ql-toolbar .ql-picker { color: var(--text-main) !important; }
-        
+            
+        .ql-snow .ql-picker-options{background-color: var(--bg-panel)}
         .code-container { width: 40%; background: var(--code-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .code-header {
             padding: 10px 15px; background: rgba(0,0,0,0.2); color: #94a3b8;
@@ -187,7 +239,7 @@
             .editor-container { height: 50%; } .code-container { height: 50%; }
         }
 
-                    /* Estilos específicos para el Plugin */
+            /* Estilos específicos para el Plugin */
     .cleaner-area {
         width: 100%;
         height: 120px;
@@ -201,6 +253,93 @@
         resize: vertical;
     }
     .cleaner-area:focus { border-color: var(--primary); outline: none; }
+
+      /* Estilos Contador de Palabras */
+.word-counter {
+    padding: 5px 15px;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    font-weight: 600;
+}
+
+/* Estilos Selector de Colores */
+.color-grid {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 0;
+}
+.color-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.color-swatch:hover {
+    transform: scale(1.1);
+    border-color: var(--text-main);
+}
+   
+
+    /* 1. El contenedor principal se convierte en una columna flexible que no hace scroll */
+.editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    height: 100%;       /* Ocupa todo el alto disponible */
+    overflow: hidden;   /* IMPORTANTE: Corta el scroll general */
+}
+
+/* 2. El editor (Quill) ocupa el espacio sobrante y maneja su propio scroll */
+#editor {
+    border: none;
+    font-size: 1rem;
+    color: var(--text-main);
+    flex: 1;            /* Ocupa todo el espacio entre la barra y el contador */
+    overflow-y: auto;   /* AQUÍ es donde ocurre el scroll ahora */
+}
+
+/* 3. El contador se queda pegado abajo */
+.word-counter {
+    padding: 5px 15px;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    font-weight: 600;
+    flex-shrink: 0;     /* Asegura que nunca se encoja ni desaparezca */
+    z-index: 10;        /* Se asegura de estar por encima */
+}
+
+/* Estilo Botón Ko-fi */
+.kofi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ff5f5f; /* Color oficial Ko-fi */
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 12px 25px;
+    border-radius: 50px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(255, 95, 95, 0.3);
+}
+
+.kofi-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 95, 95, 0.4);
+    background-color: #ff4545;
+}
+
+.kofi-btn i { font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -212,9 +351,15 @@
 
     <div class="app-wrapper">
         <aside id="sidebar">
-            <div class="brand"><i class="fas fa-layer-group"></i> Redactor HTML Pro</div>
+            <div class="brand"><i class="fas fa-layer-group"></i> Redactor HTML</div>
             <button class="btn-new" onclick="createNewDraft()"><i class="fas fa-plus"></i> Nuevo</button>
             <ul class="file-list" id="fileList"></ul>
+
+            <div class="ad-zone-container">
+        <div class="ad-placeholder">
+            <span>Espacio Publicitario <br> (Affiliate / Sponsor)</span>
+        </div>
+    </div>
             
             <div class="backup-section">
                 <button class="btn-backup" onclick="exportData()" title="Descargar archivo de respaldo">
@@ -231,8 +376,12 @@
                 <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
                 <input type="text" class="doc-title" id="docTitle" placeholder="Nombre del proyecto...">
                 <div class="actions-right">
+                    <button class="btn-icon" onclick="openCreditsModal()" title="Apoyar el proyecto">
+    <i class="fas fa-heart" style="color:#ef4444;"></i>
+</button>
                     <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
-                         <button class="btn-icon" onclick="openCleaner()" title="Limpiador IMG"><i class="fas fa-broom"></i></button>
+                    <button class="btn-icon" onclick="openColorModal()" title="Cambiar Color"><i class="fas fa-palette"></i></button>
+                  <button class="btn-icon" onclick="openCleaner()" title="Limpiador IMG"><i class="fas fa-broom"></i></button>
                     <button class="btn-save" onclick="saveCurrentDraft()"><i class="fas fa-save"></i> <span>Guardar</span></button>
                 </div>
             </div>
@@ -240,6 +389,7 @@
             <div class="workspace">
                 <div class="editor-container">
                     <div id="editor"></div>
+                    <div id="word-counter" class="word-counter">0 palabras</div>
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -250,12 +400,45 @@
                         </div>
                     </div>
                     <textarea id="html-output" readonly></textarea>
+
                 </div>
             </div>
         </main>
     </div>
+<dialog id="colorDialog">
+    <div class="dialog-header">
+        <h3><i class="fas fa-brush" style="color:var(--primary)"></i> Color de Acento</h3>
+        <button onclick="closeColorModal()" class="close-icon"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dialog-body">
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">Elige el color principal de la interfaz:</p>
+        <div class="color-grid">
+            <button class="color-swatch" style="background:#2563eb" onclick="setAppColor('#2563eb')"></button> <button class="color-swatch" style="background:#7c3aed" onclick="setAppColor('#7c3aed')"></button> <button class="color-swatch" style="background:#db2777" onclick="setAppColor('#db2777')"></button> <button class="color-swatch" style="background:#ea580c" onclick="setAppColor('#ea580c')"></button> <button class="color-swatch" style="background:#059669" onclick="setAppColor('#059669')"></button> <button class="color-swatch" style="background:#000000" onclick="setAppColor('#000000')"></button> </div>
+    </div>
+</dialog>
 
-    <dialog id="cleanerDialog">
+<dialog id="creditsModal">
+    <div class="dialog-header">
+        <h3><i class="fas fa-mug-hot" style="color:var(--primary)"></i> Redactor Pro</h3>
+        <button onclick="closeCreditsModal()" class="close-icon"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dialog-body" style="text-align: center;">
+        <p style="font-size:1.1rem; font-weight:600; margin-bottom:5px;">Version v1.0.0</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">
+            Desarrollado para crear contenido limpio y semántico.
+        </p>
+
+        <a href="https://ko-fi.com/TU_USUARIO_AQUI" target="_blank" class="kofi-btn">
+            <i class="fas fa-coffee"></i> Invítame un Café en Ko-fi
+        </a>
+
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:20px;">
+            Hecho con <i class="fas fa-heart" style="color:#ef4444"></i> por Framber Silva
+        </p>
+    </div>
+</dialog>
+
+<dialog id="cleanerDialog">
     <div class="dialog-header">
         <h3><i class="fas fa-magic" style="color:var(--accent)"></i> Limpiador de Imágenes</h3>
         <button onclick="closeCleaner()" class="close-icon"><i class="fas fa-times"></i></button>
@@ -342,6 +525,8 @@
     color: white;
 }
 </style>
+
+    
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
@@ -626,6 +811,70 @@ function clearCleanerFields() {
     setTimeout(() => btn.innerHTML = '<i class="fas fa-trash-alt"></i>', 1000);
 }
     </script>
+
+    <script>
+        // --- 1. LÓGICA CONTADOR DE PALABRAS ---
+quill.on('text-change', function() {
+    let text = quill.getText();
+    // Eliminar espacios vacíos y contar
+    let count = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+    document.getElementById('word-counter').innerText = count + ' palabras';
+    
+    // (Opcional) Llamar a updateOutput() aquí si no está automático
+    updateOutput();
+});
+
+// --- 2. LÓGICA CAMBIADOR DE COLOR ---
+const colorDialog = document.getElementById('colorDialog');
+
+function openColorModal() {
+    colorDialog.showModal();
+}
+
+function closeColorModal() {
+    colorDialog.close();
+}
+
+function setAppColor(color) {
+    // Cambiar la variable CSS --primary dinámicamente
+    document.documentElement.style.setProperty('--primary', color);
+    
+    // Guardar preferencia
+    localStorage.setItem('wc_accent_color', color);
+    
+    // Efecto visual y cerrar
+    closeColorModal();
+}
+
+// Cargar color guardado al iniciar
+const savedColor = localStorage.getItem('wc_accent_color');
+if (savedColor) {
+    document.documentElement.style.setProperty('--primary', savedColor);
+}
+
+// Cerrar al hacer clic fuera (Backdrop)
+colorDialog.addEventListener('click', (event) => {
+    if (event.target === colorDialog) colorDialog.close();
+});
+
+
+// --- LÓGICA MODAL CRÉDITOS ---
+const creditsModal = document.getElementById('creditsModal');
+
+function openCreditsModal() {
+    creditsModal.showModal();
+}
+
+function closeCreditsModal() {
+    creditsModal.close();
+}
+
+// Cerrar al hacer clic fuera
+creditsModal.addEventListener('click', (event) => {
+    if (event.target === creditsModal) creditsModal.close();
+});
+    </script>
+
 
 </body>
 </html>

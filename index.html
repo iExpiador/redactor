@@ -49,7 +49,99 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
+/* --- ESTILOS MÓVILES (APP LIKE) --- */
 
+/* Por defecto, la barra móvil está oculta */
+.mobile-nav { display: none; }
+
+@media (max-width: 900px) {
+    /* 1. Ajustes del Layout Principal */
+    body {
+        /* Espacio extra abajo para que la barra no tape el contenido */
+        padding-bottom: 80px; 
+    }
+    
+    .actions {
+        display: none !important; /* Ocultamos los botones viejos de arriba en móvil */
+    }
+
+    /* 2. Barra de Navegación Inferior */
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65px;
+        background: var(--bg-panel);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+        z-index: 999;
+        justify-content: space-around; /* Distribuye espacio equitativamente */
+        align-items: center;
+        padding: 0 10px;
+        backdrop-filter: blur(10px); /* Efecto cristal moderno */
+    }
+
+    /* Items de la barra */
+    .nav-item {
+        background: transparent;
+        border: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        gap: 4px;
+        width: 60px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    
+    .nav-item i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+
+    .nav-item:active {
+        transform: scale(0.9);
+        color: var(--primary);
+    }
+
+    /* 3. Botón Flotante Central (FAB) */
+    .nav-fab-container {
+        position: relative;
+        top: -25px; /* Elevarlo sobre la barra */
+        width: 60px;
+        height: 60px;
+    }
+
+    .nav-fab {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        border: 4px solid var(--bg-body); /* Borde para simular recorte */
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        transition: transform 0.2s;
+    }
+
+    .nav-fab:active {
+        transform: scale(0.95);
+    }
+    
+    /* Ajuste para modo oscuro en el borde del FAB */
+    [data-theme="dark"] .nav-fab {
+        border-color: #0f172a; /* Debe coincidir con el fondo oscuro */
+    }
+}
 
 
 /* --- ZONA DE PUBLICIDAD SIDEBAR --- */
@@ -227,7 +319,7 @@
         /* RESPONSIVE */
         @media (max-width: 900px) {
             aside { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.2); }
-            aside.open { transform: translateX(0); }
+            aside.open { transform: translateX(0); z-index: 1000;}
             .menu-toggle { display: block; }
             .workspace { flex-direction: column; }
             .editor-container { flex: none; height: 55%; }
@@ -340,10 +432,64 @@
 }
 
 .kofi-btn i { font-size: 1.2rem; }
+
+/* --- CORRECCIÓN RESPONSIVE --- */
+@media (max-width: 900px) {
+    /* 1. Ocultar FORZOSAMENTE los botones de arriba */
+    .top-bar .actions-right {
+        display: none !important;
+        width: 0 !important;
+        overflow: hidden;
+    }
+
+    /* 2. Centrar el título para que se vea mejor */
+    input.doc-title {
+        text-align: center;
+        padding-right: 0;
+    }
+
+    /* 3. Asegurar espacio para la barra de abajo */
+    body {
+        padding-bottom: 80px; 
+    }
+
+    /* 4. Mostrar la barra móvil */
+    .mobile-nav {
+        display: flex;
+        /* (El resto de estilos de la barra móvil se mantienen igual) */
+    }
+}
     </style>
 </head>
 <body>
 
+<nav class="mobile-nav">
+    <button class="nav-item" onclick="toggleSidebar()" title="Archivos">
+        <i class="fas fa-folder-open"></i>
+        <span>Archivos</span>
+    </button>
+    
+    <button class="nav-item" onclick="openCleaner()" title="Limpiar">
+        <i class="fas fa-broom"></i>
+        <span>Limpiar</span>
+    </button>
+
+    <div class="nav-fab-container">
+        <button class="nav-fab" onclick="saveCurrentDraft()" title="Guardar">
+            <i class="fas fa-save"></i>
+        </button>
+    </div>
+
+    <button class="nav-item" onclick="openColorModal()" title="Colores">
+        <i class="fas fa-palette"></i>
+        <span>Estilo</span>
+    </button>
+    
+    <button class="nav-item" onclick="toggleTheme()" title="Modo Oscuro">
+        <i class="fas fa-moon"></i>
+        <span>Tema</span>
+    </button>
+</nav>
     <div id="toast-container"></div>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 

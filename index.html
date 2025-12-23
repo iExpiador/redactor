@@ -186,6 +186,21 @@
             .ql-toolbar button { padding: 3px 5px; width: 24px; }
             .editor-container { height: 50%; } .code-container { height: 50%; }
         }
+
+                    /* Estilos específicos para el Plugin */
+    .cleaner-area {
+        width: 100%;
+        height: 120px;
+        background: var(--bg-body);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.85rem;
+        resize: vertical;
+    }
+    .cleaner-area:focus { border-color: var(--primary); outline: none; }
     </style>
 </head>
 <body>
@@ -217,6 +232,7 @@
                 <input type="text" class="doc-title" id="docTitle" placeholder="Nombre del proyecto...">
                 <div class="actions-right">
                     <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                         <button class="btn-icon" onclick="openCleaner()" title="Limpiador IMG"><i class="fas fa-broom"></i></button>
                     <button class="btn-save" onclick="saveCurrentDraft()"><i class="fas fa-save"></i> <span>Guardar</span></button>
                 </div>
             </div>
@@ -238,6 +254,94 @@
             </div>
         </main>
     </div>
+
+    <dialog id="cleanerDialog">
+    <div class="dialog-header">
+        <h3><i class="fas fa-magic" style="color:var(--accent)"></i> Limpiador de Imágenes</h3>
+        <button onclick="closeCleaner()" class="close-icon"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="dialog-body">
+        <label>Pega el código sucio de Blogger:</label>
+        <textarea id="dirtyInput" class="cleaner-area" placeholder='<div class="separator"><a href...><img...></a></div>'></textarea>
+        
+        <div style="display:flex; gap:10px; margin: 5px 0;">
+            <button onclick="processCleaner()" class="btn-process" style="flex:1">
+                <i class="fas fa-arrow-down"></i> Procesar y Limpiar
+            </button>
+            <button onclick="clearCleanerFields()" class="btn-clear" title="Borrar todo">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+
+        <label>Resultado limpio:</label>
+        <textarea id="cleanOutput" class="cleaner-area" readonly></textarea>
+    </div>
+
+    <div class="dialog-footer">
+        <button class="m-btn m-cncl" onclick="closeCleaner()">Cerrar</button>
+        <button class="m-btn m-ok" onclick="copyCleanCode()">Copiar Resultado</button>
+    </div>
+</dialog>
+<style>
+    /* Estilos del Dialog Nativo */
+    dialog {
+        border: none;
+        border-radius: 12px;
+        padding: 0;
+        background: var(--bg-panel);
+        color: var(--text-main);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        max-width: 600px;
+        width: 90%;
+    }
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+    }
+    
+    .dialog-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .dialog-header h3 { margin: 0; font-size: 1.1rem; }
+    .close-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
+    
+    .dialog-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .dialog-body label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    
+    .dialog-footer { padding: 15px 20px; background: var(--bg-body); border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    .cleaner-area {
+        width: 100%; height: 100px; background: var(--bg-body); color: var(--text-main);
+        border: 1px solid var(--border); border-radius: 6px; padding: 10px;
+        font-family: 'Fira Code', monospace; font-size: 0.8rem; resize: vertical;
+    }
+    .btn-process {
+        width: 100%; padding: 10px; background: var(--primary-soft); color: var(--accent);
+        border: 1px solid var(--accent); border-radius: 6px; font-weight: 600; cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-process:hover { background: var(--accent); color: white; }
+
+    .btn-clear {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 0 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+.btn-clear:hover {
+    background: var(--danger);
+    color: white;
+}
+</style>
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
@@ -455,5 +559,73 @@
         if (getDrafts().length === 0) createNewDraft();
 
     </script>
+
+    <script>
+   // --- LÓGICA DIALOG CLEANER ---
+
+const cleanerDialog = document.getElementById('cleanerDialog');
+
+function openCleaner() {
+    // showModal() es el método nativo que abre el dialog y bloquea el fondo
+    cleanerDialog.showModal();
+    document.getElementById('dirtyInput').focus();
+}
+
+function closeCleaner() {
+    cleanerDialog.close();
+}
+
+// Cerrar si se hace clic fuera del contenido (en el backdrop)
+cleanerDialog.addEventListener('click', (event) => {
+    if (event.target === cleanerDialog) {
+        cleanerDialog.close();
+    }
+});
+
+function processCleaner() {
+    const raw = document.getElementById('dirtyInput').value;
+    if (!raw.trim()) return toast("El campo está vacío", "error");
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = raw;
+    
+    const images = tempDiv.querySelectorAll('img');
+    let cleanCode = '';
+
+    if (images.length === 0) {
+        toast("No encontré imágenes", "error");
+        return;
+    }
+
+    images.forEach(img => {
+        const src = img.getAttribute('src');
+        const alt = img.getAttribute('alt') || '';
+        // Generamos img limpia con lazy loading
+        cleanCode += `<img src="${src}" alt="${alt}" loading="lazy" />\n\n`;
+    });
+
+    document.getElementById('cleanOutput').value = cleanCode.trim();
+}
+
+function copyCleanCode() {
+    const output = document.getElementById('cleanOutput');
+    if (!output.value) return;
+    output.select();
+    document.execCommand('copy');
+    toast("Código limpio copiado");
+    closeCleaner();
+}
+
+function clearCleanerFields() {
+    document.getElementById('dirtyInput').value = '';
+    document.getElementById('cleanOutput').value = '';
+    document.getElementById('dirtyInput').focus();
+    // Opcional: Feedback visual
+    const btn = event.currentTarget;
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => btn.innerHTML = '<i class="fas fa-trash-alt"></i>', 1000);
+}
+    </script>
+
 </body>
 </html>

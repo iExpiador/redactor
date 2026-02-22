@@ -298,6 +298,17 @@
         .ql-toolbar .ql-picker { color: var(--text-main) !important; }
             
         .ql-snow .ql-picker-options{background-color: var(--bg-panel)}
+        
+        /* === NUEVOS ESTILOS AÑADIDOS PARA JUSTIFICACIÓN === */
+        /* Estos estilos aseguran que el texto justificado se vea correctamente */
+        .ql-editor {
+            text-align: left; /* Valor por defecto */
+        }
+        .ql-editor p, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5 {
+            text-align: inherit;
+        }
+        /* ================================================= */
+        
         .code-container { width: 40%; background: var(--code-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .code-header {
             padding: 10px 15px; background: rgba(0,0,0,0.2); color: #94a3b8;
@@ -763,13 +774,17 @@
         }
 
         // --- QUILL EDITOR ---
+        // === TOOLBAR MODIFICADO: AÑADIDOS HEADINGS H1-H5 Y JUSTIFICACIÓN ===
         const toolbarOptions = [
-            [{ 'header': [1, 2, false] }],
+            [{ 'header': [1, 2, 3, 4, 5, false] }], // AHORA INCLUYE H1, H2, H3, H4, H5
             ['bold', 'italic', 'underline', 'blockquote'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'align': [] }], // NUEVO: AÑADE OPCIONES DE ALINEACIÓN (IZQUIERDA, CENTRO, DERECHA, JUSTIFICADO)
             ['link', 'image', 'video'],
             ['clean']
         ];
+        // ====================================================================
+        
         const quill = new Quill('#editor', {
             theme: 'snow',
             modules: { toolbar: toolbarOptions },
